@@ -12,5 +12,5 @@ sudo chown root:video /dev/dri/renderD128
 sudo mkdir -p $XDG_RUNTIME_DIR
 sudo chown $(id -nu):$(id -ng) $XDG_RUNTIME_DIR
 
-wayfire
+sudo wayfire
 # wayvnc 0.0.0.0
