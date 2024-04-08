@@ -15,9 +15,9 @@ RUN dpkg --add-architecture armhf && echo 'deb http://deb.debian.org/debian sid 
   && apt-get install libc6:armhf -y -q \
   && apt-get install -q -y --no-install-recommends \
   gnupg lsb-release curl tar unzip zip \
-  apt-transport-https ca-certificates sudo gpg-agent software-properties-common zlib1g-dev \
-  zstd gettext libcurl4-openssl-dev inetutils-ping jq wget dirmngr openssh-client locales \
-  && apt-get install -q -y git cmake binfmt-support wayvnc wayfire xwayland kanshi xterm vim zenity pulseaudio bemenu default-jdk \
+  apt-transport-https ca-certificates sudo gpg-agent apt-utils dialog zlib1g-dev \
+  zstd gettext libcurl4-openssl-dev inetutils-ping jq wget dirmngr locales \
+  && apt-get install -q -y binfmt-support tigervnc-standalone-server tigervnc-tools openbox xterm zenity pulseaudio suckless-tools default-jdk \
   && apt-get clean && rm -rf /var/lib/apt/lists/* 
 
 COPY --from=temp /temp/ /
@@ -33,16 +33,18 @@ RUN update-binfmts --import
 
 RUN useradd -m -s /bin/bash -G sudo,video,audio ${user} && echo "${user}:${user}" | chpasswd && echo '%sudo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-COPY files/start.sh /start.sh
-COPY files/wayfire.ini /home/${user}/.config/wayfire.ini
+COPY files/openbox/start.sh /start.sh
+COPY files/openbox /home/${user}/.config/
 
-RUN sed -i "s/# \(en_US\.UTF-8 .*\)/\1/" /etc/locale.gen && sed -i "s/# \(ja_JP\.UTF-8 .*\)/\1/" /etc/locale.gen && locale-gen
+RUN sed -i "s/# \(en_US\.UTF-8 .*\)/\1/" /etc/locale.gen && locale-gen
 
 RUN echo "load-module module-native-protocol-tcp auth-anonymous=1" >> /etc/pulse/default.pa && chown -R ${user}:${user} /home/${user}
 
 # wget -q https://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-aarch64.deb -O rustdesk.deb && sudo apt-get install -f -y -q ./rustdesk.deb && rm rustdesk.deb
 
 USER ${user}
+RUN printf "password\npassword\n\n" | vncpasswd
+
 WORKDIR /home/${user}
 CMD [ "/start.sh" ]
 EXPOSE 5900
