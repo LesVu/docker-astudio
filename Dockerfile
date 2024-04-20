@@ -28,13 +28,13 @@ RUN wget https://itai-nelken.github.io/weekly-box86-debs/debian/box86.list -O /e
   && apt-get update && apt-get install -q -y box86:armhf box64 \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY files/binfmts/* /usr/share/binfmts
+COPY files/main/binfmts/* /usr/share/binfmts
 RUN update-binfmts --import
 
 RUN useradd -m -s /bin/bash -G sudo,video,audio ${user} && echo "${user}:${user}" | chpasswd && echo '%sudo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-COPY files/start.sh /start.sh
-COPY files/wayfire.ini /home/${user}/.config/wayfire.ini
+COPY files/main/start.sh /start.sh
+COPY files/main/wayfire.ini /home/${user}/.config/wayfire.ini
 
 RUN sed -i "s/# \(en_US\.UTF-8 .*\)/\1/" /etc/locale.gen && sed -i "s/# \(ja_JP\.UTF-8 .*\)/\1/" /etc/locale.gen && locale-gen
 
